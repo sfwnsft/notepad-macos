@@ -10,6 +10,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupWindow()
     }
 
+    func application(_ sender: NSApplication, openFiles filenames: [String]) {
+        guard let first = filenames.first else {
+            sender.reply(toOpenOrPrint: .failure)
+            return
+        }
+
+        let url = URL(fileURLWithPath: first)
+        do {
+            let str = try String(contentsOf: url, encoding: .utf8)
+            DispatchQueue.main.async {
+                self.textView.string = str
+                self.currentURL = url
+                self.window.title = url.lastPathComponent
+            }
+            sender.reply(toOpenOrPrint: .success)
+        } catch {
+            sender.reply(toOpenOrPrint: .failure)
+            showError("Failed to open file:\n\(error.localizedDescription)")
+        }
+    }
+
     func setupWindow() {
         let rect = NSRect(x: 0, y: 0, width: 900, height: 600)
         window = NSWindow(contentRect: rect, styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
