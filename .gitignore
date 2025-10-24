@@ -5,5 +5,8 @@ __pycache__/
 .DS_Store
 icon.iconset/
 Notepad.dmg
+Notepad.app/
+Notepad.icns
+notepad
 *.xcuserdata
 build/
