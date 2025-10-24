@@ -1,0 +1,9 @@
+/.venv
+/.venv/
+*.pyc
+__pycache__/
+.DS_Store
+icon.iconset/
+Notepad.dmg
+*.xcuserdata
+build/
