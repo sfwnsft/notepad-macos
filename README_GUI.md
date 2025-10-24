@@ -106,3 +106,18 @@ Safwan Safat — https://github.com/sfwnsft — safwansafatswe@gmail.com
 This project is licensed under the MIT License. See `LICENSE` for details.
 
 ```
+
+Latest local build (artifact info)
+
+- Version: 0.1.0 (CFBundleShortVersionString)
+- Build: 1 (CFBundleVersion)
+- Built: 2025-10-24T13:19:38Z (UTC)
+- Artifacts produced by local build:
+	- `Notepad.app/` — app bundle (generated)
+	- `Notepad.icns` — generated icon (~198 KB)
+	- `Notepad.dmg` — packaged disk image (~209 KB)
+
+Notes:
+
+- These artifacts are intentionally not tracked in git (see `.gitignore`). If you remove them locally, re-run `./build.sh` and `./create_dmg.sh` to reproduce.
+- Signing and notarization are not performed by the scripts; they must be done with a Developer ID certificate prior to distribution.
