@@ -10,16 +10,13 @@ BUILD_DIR="build"
 rm -rf "$BUILD_DIR" "$BUNDLE_NAME"
 mkdir -p "$BUILD_DIR"
 
-# Compile the Swift AppKit program
 swiftc -o "$BUILD_DIR/$EXECUTABLE" "$SRC" -framework Cocoa
 
-# Create .app bundle structure
 mkdir -p "$BUNDLE_NAME/Contents/MacOS"
 mkdir -p "$BUNDLE_NAME/Contents/Resources"
 cp "$BUILD_DIR/$EXECUTABLE" "$BUNDLE_NAME/Contents/MacOS/$EXECUTABLE"
 cp Info.plist "$BUNDLE_NAME/Contents/Info.plist"
 
-# Generate icon if missing and copy into Resources
 if [ ! -f Notepad.icns ]; then
 	echo "Notepad.icns not found — generating a placeholder icon (Notepad.icns)."
 	./generate_icon.sh

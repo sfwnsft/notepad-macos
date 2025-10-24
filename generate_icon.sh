@@ -1,14 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# Generates Notepad.icns from an embedded tiny PNG (base64) using sips and iconutil.
-# This is a minimal placeholder icon. Replace icon.png with a better PNG if you want.
-
 OUT_ICNS="Notepad.icns"
 ICON_PNG="icon.png"
 ICONSET_DIR="icon.iconset"
 
-# If the user placed a custom icon.png in the repo, use it. Otherwise decode embedded fallback.
 CREATED_FALLBACK=0
 if [ -f "$ICON_PNG" ] && [ -s "$ICON_PNG" ]; then
     echo "Using existing $ICON_PNG"
@@ -19,23 +15,23 @@ else
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=
 PNGBASE64
 
-    # decode base64 into PNG (macOS: base64 -D). Fallback to --decode if available.
+    
     if base64 -D -i icon.b64 -o "$ICON_PNG" 2>/dev/null; then
         :
     elif base64 --decode icon.b64 > "$ICON_PNG" 2>/dev/null; then
         :
     else
-        # try openssl as last resort
+        
         openssl base64 -d -in icon.b64 -out "$ICON_PNG"
     fi
     rm -f icon.b64
 fi
 
-# Create iconset directory
+
 rm -rf "$ICONSET_DIR"
 mkdir -p "$ICONSET_DIR"
 
-# Create the various icon sizes using sips (will upscale the tiny PNG; replace with a real image for better results)
+
 sips -z 16 16     "$ICON_PNG" --out "$ICONSET_DIR/icon_16x16.png"
 sips -z 32 32     "$ICON_PNG" --out "$ICONSET_DIR/icon_16x16@2x.png"
 sips -z 32 32     "$ICON_PNG" --out "$ICONSET_DIR/icon_32x32.png"
@@ -47,7 +43,7 @@ sips -z 512 512   "$ICON_PNG" --out "$ICONSET_DIR/icon_256x256@2x.png"
 sips -z 512 512   "$ICON_PNG" --out "$ICONSET_DIR/icon_512x512.png"
 sips -z 1024 1024 "$ICON_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png"
 
-# Create .icns
+
 if command -v iconutil >/dev/null 2>&1; then
     iconutil -c icns "$ICONSET_DIR" -o "$OUT_ICNS"
     echo "Created $OUT_ICNS"
@@ -56,7 +52,7 @@ else
     exit 1
 fi
 
-# Cleanup: remove the iconset and remove the fallback icon.png only if we created it
+
 if [ -d "$ICONSET_DIR" ]; then
     rm -rf "$ICONSET_DIR"
 fi

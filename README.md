@@ -1,8 +1,10 @@
 # Simple Notepad (C)
+```markdown
+# Simple Notepad — Console version (C)
 
-This is a small standalone console notepad written in C.
+A tiny, standalone console notepad written in C. This repository also contains a macOS GUI version (see `README_GUI.md`).
 
-Build
+Quick build (console)
 
 ```bash
 gcc -std=c11 -Wall -Wextra -o notepad test.c
@@ -14,24 +16,33 @@ Run
 ./notepad
 ```
 
-Usage
+Basic usage
 
-- Choose `New file` or `Open file` from the menu.
-- In editor mode, type text lines. Commands start with `:` on a line by itself.
-  - `:w [filename]`  — save (use current filename if omitted)
-  - `:wq [filename]` — save and quit editor
-  - `:q`             — quit editor (asks if unsaved)
-  - `:p`             — print buffer
+- Start a new editing session or open an existing file.
+- In the simple editor mode, commands begin with `:` on a line by itself. Useful commands:
+  - `:w [filename]`  — save (uses current filename if omitted)
+  - `:wq [filename]` — save and quit
+  - `:q`             — quit (prompts if unsaved)
+  - `:p`             — print buffer to stdout
   - `:e filename`    — open another file
   - `:h` or `:help`  — show help
 
 Notes
 
-- This program stores the file content in a single dynamically grown buffer.
-- It is intentionally simple; features like line numbers, random-access editing, or syntax highlighting are not provided.
+- This is intentionally minimal: no line numbers, no syntax highlighting, and no random-access editing.
+- The code demonstrates a simple buffer growth strategy and basic file operations in C.
+
+Where to look
+
+- `Notepad.c` — the console notepad implementation.
+- `README_GUI.md` — macOS GUI version details and packaging instructions.
 
 License
 
 This project is licensed under the MIT License — see the `LICENSE` file for details.
 
-If you share prebuilt binaries (for convenience), note that unsigned macOS apps may trigger Gatekeeper warnings. To run an unsigned app, users can right-click the app and choose "Open" and then confirm in the dialog. For a smooth experience, sign and notarize the app (requires an Apple Developer account).
+Contact / Author
+
+Safwan Safat — https://github.com/sfwnsft — safwansafatswe@gmail.com
+
+```
