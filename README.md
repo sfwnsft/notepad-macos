@@ -1,72 +1,68 @@
-# Simple Notepad (C)
-```markdown
-# Simple Notepad — Console version (C)
+# Notepad — macOS GUI
 
-A tiny, standalone console notepad written in C. This repository also contains a macOS GUI version (see `README_GUI.md`).
+This repository contains a native macOS Notepad implemented with Swift and AppKit. The project has been simplified to focus on the GUI application and macOS distribution. The previous console C program and the icon-generation pipeline have been removed to reduce repository clutter.
 
-Quick build (console)
+Contents
+
+- `main.swift` — AppKit application source (single-window text editor with File/Edit menus and About panel).
+- `Info.plist` — bundle metadata (CFBundle identifier, version, icon reference).
+- `build.sh` — builds `Notepad.app` from the Swift source.
+- `create_dmg.sh` — packages `Notepad.dmg` using `hdiutil`.
+- `Notepad.app` / `Notepad.dmg` — build artifacts (not tracked by git by default).
+- `Notepad.icns` — last generated icon (artifact; not tracked).
+- `LICENSE`, `.gitignore`, `README.md` — documentation and repo config.
+
+Build & run (macOS)
+
+Make the scripts executable and build the app locally:
 
 ```bash
-gcc -std=c11 -Wall -Wextra -o notepad test.c
+cd "/Users/safwan/Documents/GitHub/New Project"
+chmod +x build.sh create_dmg.sh
+./build.sh
+
+# Launch the app via Finder or:
+open Notepad.app
+# Or run the binary directly (useful for debugging):
+./Notepad.app/Contents/MacOS/Notepad
 ```
 
-Run
+Create a DMG
 
 ```bash
-./notepad
+./create_dmg.sh
+# This writes Notepad.dmg into the repository root (or overwrites if present).
 ```
 
-Basic usage
+Notes about removed files
 
-- Start a new editing session or open an existing file.
-- In the simple editor mode, commands begin with `:` on a line by itself. Useful commands:
-  - `:w [filename]`  — save (uses current filename if omitted)
-  - `:wq [filename]` — save and quit
-  - `:q`             — quit (prompts if unsaved)
-  - `:p`             — print buffer to stdout
-  - `:e filename`    — open another file
-  - `:h` or `:help`  — show help
+- The old console program (`Notepad.c`) has been removed and is no longer part of the project. If you need it later, it can be restored from the git history.
+- The icon-generation pipeline (`generate_icon.sh`, `make_notepad_icon.swift`, `icon.png`) has been removed. The repository keeps the last generated `Notepad.icns` as a local artifact; if you want the pipeline back I can reintroduce it or provide a simpler script.
 
-Notes
+Code signing & notarization
 
-- This is intentionally minimal: no line numbers, no syntax highlighting, and no random-access editing.
-- The code demonstrates a simple buffer growth strategy and basic file operations in C.
+- The provided scripts do not perform code signing or notarization. To distribute the app without Gatekeeper warnings, sign the app with a Developer ID certificate and notarize the DMG. Example commands (replace placeholders):
 
-Where to look
+```bash
+codesign --timestamp --options runtime --sign "Developer ID Application: Your Name (TEAMID)" Notepad.app
+xcrun notarytool submit Notepad.dmg --apple-id "you@domain" --team-id TEAMID --password @keychain:NOTARY_PASSWORD
+xcrun stapler staple Notepad.dmg
+```
 
-- `Notepad.c` — the console notepad implementation.
-- `README_GUI.md` — macOS GUI version details and packaging instructions.
+Latest local build
 
-License
+- Version: 0.1.0
+- Build: 1
+- Built: 2025-10-24T13:19:38Z (UTC)
 
-This project is licensed under the MIT License — see the `LICENSE` file for details.
+If you'd like
 
-Contact / Author
+1. I can remove `Notepad.icns` from the working tree (keep it ignored), or keep it for convenience.
+2. I can add a GitHub Actions macOS workflow to build the app automatically on pushes/PRs.
+3. I can re-add the icon-generation pipeline or provide a small utility to produce an `.icns` from a PNG.
+
+Author & license
 
 Safwan Safat — https://github.com/sfwnsft — safwansafatswe@gmail.com
 
-```
-
-Latest local build (artifact info)
-
-- Version: 0.1.0 (CFBundleShortVersionString)
-- Build: 1 (CFBundleVersion)
-- Built: 2025-10-24T13:19:38Z (UTC)
-- Artifacts produced by the local macOS build (see `README_GUI.md` for build steps):
-  - `Notepad.app/` — app bundle (generated)
-  - `Notepad.icns` — generated icon (~198 KB)
-  - `Notepad.dmg` — packaged disk image (~209 KB)
-
-Reproducibility
-
-```bash
-# Rebuild the app and create a new dmg (macOS):
-chmod +x build.sh create_dmg.sh generate_icon.sh
-./build.sh
-./create_dmg.sh
-```
-
-Notes
-
-- The created artifacts are ignored by `.gitignore` so the repo stays clean.
-- Signing and notarization must be done with an Apple Developer ID before public distribution.
+This project is licensed under the MIT License — see `LICENSE` for details.
