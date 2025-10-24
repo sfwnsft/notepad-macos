@@ -1,8 +1,5 @@
-# Notepad
-
-A native macOS Notepad implemented with Swift and AppKit. 
-
-Build & run (macOS)
+# Notepad  
+## A native macOS Notepad implemented with Swift and AppKit. 
 
 Build the app locally
 
@@ -26,8 +23,4 @@ Create a DMG
 ```
 
 Author: Safwan Safat  
-(GitHub)[https://github.com/sfwnsft]  
-(LinkedIn)[https://www.linkedin.com/in/sfwnsft/]  
-(Email)[safwansafatswe@gmail.com]
-
 This project is licensed under the MIT License. 
