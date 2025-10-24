@@ -11,7 +11,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupMenu()
         setupWindow()
         
-        // Load any file that was queued before window was ready
         if let pending = pendingFileToOpen {
             pendingFileToOpen = nil
             _ = openFileAtPath(pending)
@@ -24,14 +23,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        // If window isn't ready yet, queue the file to open later
         if window == nil || textView == nil {
             pendingFileToOpen = first
             sender.reply(toOpenOrPrint: .success)
             return
         }
 
-        // Window is ready, open immediately
         if openFileAtPath(first) {
             sender.reply(toOpenOrPrint: .success)
         } else {
@@ -53,13 +50,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
     
-    // Load file with encoding fallback
     func loadFile(from url: URL) -> String? {
-        // Try UTF-8 first (most common)
         if let str = try? String(contentsOf: url, encoding: .utf8) {
             return str
         }
-        // Try other common encodings
         let encodings: [String.Encoding] = [.utf16, .isoLatin1, .windowsCP1252, .macOSRoman, .ascii]
         for encoding in encodings {
             if let str = try? String(contentsOf: url, encoding: encoding) {
@@ -95,7 +89,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func setupMenu() {
         let mainMenu = NSMenu()
         
-        // App menu
         let appMenuItem = NSMenuItem()
         mainMenu.addItem(appMenuItem)
         let appMenu = NSMenu()
@@ -106,7 +99,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(NSMenuItem(title: "Quit Notepad", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         appMenuItem.submenu = appMenu
 
-        // File menu (before Edit, per macOS convention)
         let fileMenuItem = NSMenuItem()
         mainMenu.addItem(fileMenuItem)
         let fileMenu = NSMenu(title: "File")
@@ -117,16 +109,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         fileMenu.addItem(withTitle: "Save", action: #selector(saveFile), keyEquivalent: "s")
         fileMenu.addItem(withTitle: "Save As…", action: #selector(saveAsFile), keyEquivalent: "S")
 
-        // Edit menu
         let editMenuItem = NSMenuItem()
         mainMenu.addItem(editMenuItem)
         let editMenu = NSMenu(title: "Edit")
         editMenuItem.submenu = editMenu
         let undoItem = NSMenuItem(title: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
-        undoItem.target = nil  // nil target allows first responder to handle
+        undoItem.target = nil
         editMenu.addItem(undoItem)
         let redoItem = NSMenuItem(title: "Redo", action: Selector(("redo:")), keyEquivalent: "Z")
-        redoItem.target = nil  // nil target allows first responder to handle
+        redoItem.target = nil
         editMenu.addItem(redoItem)
         editMenu.addItem(NSMenuItem.separator())
         editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
