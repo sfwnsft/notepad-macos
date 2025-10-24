@@ -1,7 +1,9 @@
 # Notepad  
-## A native macOS Notepad implemented with Swift and AppKit. 
+## A native macOS Notepad made with Swift and AppKit. 
 
-Build the app locally
+**Installation**: Download Notepad.zip and decompress it. Then move Notepad.app to the "Applications" folder to use it.  
+
+**Build the app locally**
 
 ```bash
 cd "/Users/safwan/Documents/GitHub/New Project"
@@ -15,7 +17,7 @@ open Notepad.app
 ./Notepad.app/Contents/MacOS/Notepad
 ```
 
-Create a DMG
+**Create a Disk Image (.dmg)**
 
 ```bash
 ./create_dmg.sh
