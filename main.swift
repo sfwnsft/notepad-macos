@@ -4,10 +4,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var textView: NSTextView!
     var currentURL: URL?
+    var pendingFileToOpen: String?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
         setupMenu()
         setupWindow()
+        
+        // Load any file that was queued before window was ready
+        if let pending = pendingFileToOpen {
+            pendingFileToOpen = nil
+            _ = openFileAtPath(pending)
+        }
     }
 
     func application(_ sender: NSApplication, openFiles filenames: [String]) {
@@ -16,19 +24,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let url = URL(fileURLWithPath: first)
-        do {
-            let str = try String(contentsOf: url, encoding: .utf8)
+        // If window isn't ready yet, queue the file to open later
+        if window == nil || textView == nil {
+            pendingFileToOpen = first
+            sender.reply(toOpenOrPrint: .success)
+            return
+        }
+
+        // Window is ready, open immediately
+        if openFileAtPath(first) {
+            sender.reply(toOpenOrPrint: .success)
+        } else {
+            sender.reply(toOpenOrPrint: .failure)
+            showError("Failed to open file: encoding not supported or file unreadable")
+        }
+    }
+    
+    func openFileAtPath(_ path: String) -> Bool {
+        let url = URL(fileURLWithPath: path)
+        if let str = loadFile(from: url) {
             DispatchQueue.main.async {
                 self.textView.string = str
                 self.currentURL = url
                 self.window.title = url.lastPathComponent
             }
-            sender.reply(toOpenOrPrint: .success)
-        } catch {
-            sender.reply(toOpenOrPrint: .failure)
-            showError("Failed to open file:\n\(error.localizedDescription)")
+            return true
         }
+        return false
+    }
+    
+    // Load file with encoding fallback
+    func loadFile(from url: URL) -> String? {
+        // Try UTF-8 first (most common)
+        if let str = try? String(contentsOf: url, encoding: .utf8) {
+            return str
+        }
+        // Try other common encodings
+        let encodings: [String.Encoding] = [.utf16, .isoLatin1, .windowsCP1252, .macOSRoman, .ascii]
+        for encoding in encodings {
+            if let str = try? String(contentsOf: url, encoding: encoding) {
+                return str
+            }
+        }
+        return nil
     }
 
     func setupWindow() {
@@ -44,6 +82,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         textView = NSTextView(frame: NSRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height))
         textView.isRichText = false
         textView.font = NSFont.userFixedPitchFont(ofSize: 13)
+        textView.allowsUndo = true
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticDashSubstitutionEnabled = false
 
         scrollView.documentView = textView
         window.contentView!.addSubview(scrollView)
@@ -53,6 +94,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func setupMenu() {
         let mainMenu = NSMenu()
+        
+        // App menu
         let appMenuItem = NSMenuItem()
         mainMenu.addItem(appMenuItem)
         let appMenu = NSMenu()
@@ -63,17 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(NSMenuItem(title: "Quit Notepad", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         appMenuItem.submenu = appMenu
 
-        let editMenuItem = NSMenuItem()
-        mainMenu.addItem(editMenuItem)
-        let editMenu = NSMenu(title: "Edit")
-        editMenuItem.submenu = editMenu
-        editMenu.addItem(NSMenuItem.separator())
-        editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
-        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
-        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
-        editMenu.addItem(NSMenuItem.separator())
-        editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
-
+        // File menu (before Edit, per macOS convention)
         let fileMenuItem = NSMenuItem()
         mainMenu.addItem(fileMenuItem)
         let fileMenu = NSMenu(title: "File")
@@ -83,6 +116,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         fileMenu.addItem(NSMenuItem.separator())
         fileMenu.addItem(withTitle: "Save", action: #selector(saveFile), keyEquivalent: "s")
         fileMenu.addItem(withTitle: "Save As…", action: #selector(saveAsFile), keyEquivalent: "S")
+
+        // Edit menu
+        let editMenuItem = NSMenuItem()
+        mainMenu.addItem(editMenuItem)
+        let editMenu = NSMenu(title: "Edit")
+        editMenuItem.submenu = editMenu
+        let undoItem = NSMenuItem(title: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
+        undoItem.target = nil  // nil target allows first responder to handle
+        editMenu.addItem(undoItem)
+        let redoItem = NSMenuItem(title: "Redo", action: Selector(("redo:")), keyEquivalent: "Z")
+        redoItem.target = nil  // nil target allows first responder to handle
+        editMenu.addItem(redoItem)
+        editMenu.addItem(NSMenuItem.separator())
+        editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(NSMenuItem.separator())
+        editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
 
         NSApp.mainMenu = mainMenu
     }
@@ -98,15 +149,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         panel.canChooseFiles = true
         panel.begin { result in
             if result == .OK, let url = panel.url {
-                do {
-                    let str = try String(contentsOf: url, encoding: .utf8)
+                if let str = self.loadFile(from: url) {
                     DispatchQueue.main.async {
                         self.textView.string = str
                         self.currentURL = url
                         self.window.title = url.lastPathComponent
                     }
-                } catch {
-                    self.showError("Failed to open file:\n\(error.localizedDescription)")
+                } else {
+                    self.showError("Failed to open file: encoding not supported or file unreadable")
                 }
             }
         }

@@ -17,12 +17,10 @@ mkdir -p "$BUNDLE_NAME/Contents/Resources"
 cp "$BUILD_DIR/$EXECUTABLE" "$BUNDLE_NAME/Contents/MacOS/$EXECUTABLE"
 cp Info.plist "$BUNDLE_NAME/Contents/Info.plist"
 
-if [ ! -f Notepad.icns ]; then
-	echo "Notepad.icns not found — generating a placeholder icon (Notepad.icns)."
-	./generate_icon.sh
-fi
 if [ -f Notepad.icns ]; then
 	cp Notepad.icns "$BUNDLE_NAME/Contents/Resources/Notepad.icns"
+else
+	echo "Warning: Notepad.icns not found. App will use default icon." >&2
 fi
 
 echo "Built $BUNDLE_NAME"

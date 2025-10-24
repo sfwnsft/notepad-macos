@@ -6,7 +6,6 @@ __pycache__/
 icon.iconset/
 Notepad.dmg
 Notepad.app/
-Notepad.icns
 notepad
 *.xcuserdata
 build/

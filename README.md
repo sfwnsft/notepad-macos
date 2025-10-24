@@ -6,7 +6,7 @@
 **Build the app locally**
 
 ```bash
-cd "/Users/safwan/Documents/GitHub/New Project"
+cd notepad-macos
 chmod +x build.sh create_dmg.sh
 ./build.sh
 

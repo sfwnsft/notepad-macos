@@ -9,7 +9,7 @@
     <key>CFBundleExecutable</key>
     <string>Notepad</string>
     <key>CFBundleIdentifier</key>
-    <string>com.example.notepad</string>
+    <string>com.sfwnsft.notepad</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleIconFile</key>
@@ -18,11 +18,20 @@
     <string>0.1.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2025 Safwan Safat. All rights reserved.</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
             <key>CFBundleTypeName</key>
             <string>Plain Text</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>txt</string>
+                <string>text</string>
+            </array>
             <key>LSItemContentTypes</key>
             <array>
                 <string>public.plain-text</string>
