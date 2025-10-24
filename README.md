@@ -29,3 +29,9 @@ Notes
 
 - This program stores the file content in a single dynamically grown buffer.
 - It is intentionally simple; features like line numbers, random-access editing, or syntax highlighting are not provided.
+
+License
+
+This project is licensed under the MIT License — see the `LICENSE` file for details.
+
+If you share prebuilt binaries (for convenience), note that unsigned macOS apps may trigger Gatekeeper warnings. To run an unsigned app, users can right-click the app and choose "Open" and then confirm in the dialog. For a smooth experience, sign and notarize the app (requires an Apple Developer account).
